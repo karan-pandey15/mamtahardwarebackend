@@ -1,3 +1,4 @@
+const path = require("path");
 const Sunmica = require("../models/sunmica.model");
 
 // Create new Sunmica entry
@@ -6,7 +7,8 @@ exports.createSunmica = async (req, res) => {
     const { name, points, description, category } = req.body;
     const files = req.files || [];
 
-    const images = files.map((file) => `uploads/${file.filename}`);
+    // Normalize file paths for consistent URLs served from /uploads
+    const images = files.map((file) => path.posix.join("uploads", file.filename));
 
     const sunmica = new Sunmica({
       name,
