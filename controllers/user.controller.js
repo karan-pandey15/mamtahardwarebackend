@@ -30,17 +30,19 @@ require('dotenv').config(); // Load env vars
 // Login
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { phone, password } = req.body;    
+    const formattedPhone = phone.startsWith("+91") ? phone : `+91${phone}`; // ✅ normalize
+
+    const user = await User.findOne({ phone: formattedPhone });
 
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,   // ✅ fixed
-      { expiresIn: '1h' }
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
     res.json({
